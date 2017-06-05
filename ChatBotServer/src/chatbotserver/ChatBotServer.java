@@ -9,10 +9,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -20,132 +23,126 @@ import javafx.stage.Stage;
  */
 public class ChatBotServer extends Application {
 
-    public static ChatBotServer aplicacao;
+	public static ChatBotServer aplicacao;
 
-    private ChatBotServerController controller;
+	private ChatBotServerController controller;
 
-    private ObjectOutputStream output; // gera fluxo de saída para o cliente.
-    private ObjectInputStream input; // gera fluxo de entrada a partir do cliente.
-    
-    private ServerSocket server; // Socket do servidor.
-    private Socket conexao; // conexão com o cliente.
-    private int contador = 1; // Contador do número de conexões.
+	private ServerSocket server; // Socket do servidor.
+	private int contador = 1; // Contador do número de conexões.
 
-    @Override
-    public void start(Stage stage) throws Exception {
+	public static ObservableList<Cliente> clientes;
 
-        aplicacao = this;
+	@Override
+	public void start(Stage stage) throws Exception {
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ChatBotServerLayout.fxml"));
+		aplicacao = this;
+		clientes = FXCollections.observableArrayList();
 
-        Parent root = loader.load();
-        controller = loader.getController();
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/ChatBotServerLayout.fxml"));
 
-        Scene scene = new Scene(root);
+		Parent root = loader.load();
+		controller = loader.getController();
 
-        stage.setTitle("Servidor Chat Bot");
-        stage.setScene(scene);
-        stage.show();
-    }
+		controller.clientes.setItems(clientes);
 
-    public void rodarServidor() {
+		Scene scene = new Scene(root);
 
-        try {
-            int porta = Integer.parseInt(controller.txPorta.getText());
-            int limiteClientes = Integer.parseInt(controller.txConexoes.getText());
+		stage.setTitle("Servidor Chat Bot");
+		stage.setScene(scene);
+		stage.show();
 
-            // cria o ServerSocket
-            server = new ServerSocket(porta, limiteClientes);
+		stage.setOnCloseRequest((WindowEvent e) -> {
+			fecharConexao();
+		});
 
-            while (true) {
-                try {
-                    aguardaConexao(); // espera uma conexão.
-                    getStreams(); // obtém os fluxos de entrada e saída.
-                    processaConexao(); // processa a conexão.
-                } catch (EOFException eOFException) {
-                    exibirMensagem("Servidor encerrou a conexão.");
-                } finally {
-                    fecharConexao(); // fecha a conexão.
-                    contador++;
-                }
-            }
+	}
 
-        } catch (IOException iOException) {
-            exibirMensagem("Não foi possível iniciar o servidor!");
-            iOException.printStackTrace();
-        }
+	public void rodarServidor() {
 
-        
-    }
+		try {
+			int porta = Integer.parseInt(controller.txPorta.getText());
+			int limiteClientes = Integer.parseInt(controller.txConexoes.getText());
 
-    private void aguardaConexao() throws IOException{
-        exibirMensagem("Aguardando conexão");
-        conexao = server.accept(); // permite que o servidor aceite a conexão.
-        exibirMensagem("Conexão " + contador + " recebida de: " + 
-                conexao.getInetAddress().getHostName());
-    }
-    
-    private void getStreams() throws IOException{
-        
-        // configura o fluxo de saída para objetos.
-        output = new ObjectOutputStream(conexao.getOutputStream());
-        output.flush(); // esvazia buffer de saída para enviar as informações de cabeçalho.
-        
-        // configura o fluxo de entrada para objetos.
-        input = new ObjectInputStream(conexao.getInputStream());
-        exibirMensagem("Obteve Streams de entrada e saída");
-    }
-    
-    private void processaConexao() throws IOException{
-        
-        String mensagem = null;
-        
-        enviarDados("Conexão estabelecida com sucesso");
-        
-        // processa as mensagens enviadas pelo cliente
-        do{
-            try{ // lê e exibe a mensagem
-                mensagem = (String) input.readObject();
-                exibirMensagem(mensagem);
-                enviarDados("recebido, agora já pode jogar lol");
-            }catch(ClassNotFoundException classNotFoundException){
-                exibirMensagem("Tipo de objeto desconhecido recebido");
-            }
-        }while(!mensagem.equals("encerrar"));
-        
-    }
-    
-    public void fecharConexao(){
-        exibirMensagem("Fechando conexão");
-        try{
-            output.close();
-            input.close();
-            conexao.close();
-        }catch(IOException iOException){
-            iOException.printStackTrace();
-        }
-    }
-    
-    // envia mensagem para o cliente.
-    private void enviarDados(String mensagem){
-        
-        try{ // envia o objeto ao cliente.
-            output.writeObject(mensagem);
-            output.flush(); // esvazia a saída para o cliente.
-            exibirMensagem(mensagem);
-        }catch(IOException iOException){
-            exibirMensagem("Erro enviando objeto");
-        }
-        
-    }
-    
-    private void exibirMensagem(String msg) {
-        Platform.runLater(() -> {
-            controller.taMensagens.appendText(msg + "\n");
-        });
-    }
+			// cria o ServerSocket
+			server = new ServerSocket(porta, limiteClientes);
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+			while (controller.isServerRunning.get()) {
+
+				Socket clientSocket = null;
+
+				try {
+					clientSocket = aguardaConexao(); // espera uma conexão.
+					
+					Cliente c = new Cliente(clientSocket, controller);
+					Thread t = new Thread(c);
+					t.start();
+
+				} catch (EOFException eOFException) {
+					exibirMensagem("\nServidor encerrou a conexão.");
+				} finally {
+					contador++;
+				}
+			}
+
+		} catch (IOException iOException) {
+			exibirMensagem("\nNão foi possível iniciar o servidor!");
+			iOException.printStackTrace();
+		} finally {
+			if (!controller.isServerRunning.get())
+				fecharConexao(); // fecha a conexão.
+		}
+
+	}
+
+	private Socket aguardaConexao() throws IOException {
+
+		exibirMensagem("\nAguardando conexão");
+
+		Socket conexao = server.accept(); // permite que o servidor aceite a
+											// conexão.
+		exibirMensagem("\nConexão " + contador + " recebida de: " + conexao.getInetAddress().getHostName());
+		return conexao;
+	}
+
+	public void fecharConexao() {
+		exibirMensagem("\nFechando conexão");
+		System.out.println("Fechando conexão");
+//		if (!clientes.isEmpty()) {
+			try {
+//				for (Cliente cliente : clientes) {
+//
+//					ObjectOutputStream output = cliente.getOutput();
+//					ObjectInputStream input = cliente.getInput();
+//					Socket conexao = cliente.getConexao();
+//					try {
+//						cliente.finalize();
+//
+//					} catch (Throwable e) {
+//						e.printStackTrace();
+//					}
+//					output.close();
+//					input.close();
+//					conexao.close();
+				if(!server.isClosed()){
+					server.close();}
+
+//				}
+//				Platform.runLater(() -> {
+//					clientes.clear();
+//				});
+			} catch (IOException iOException) {
+				iOException.printStackTrace();
+			}
+//		}
+	}
+
+	private void exibirMensagem(String msg) {
+		Platform.runLater(() -> {
+			controller.taMensagens.appendText(msg);
+		});
+	}
+
+	public static void main(String[] args) {
+		launch(args);
+	}
 }

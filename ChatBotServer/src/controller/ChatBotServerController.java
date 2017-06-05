@@ -3,12 +3,19 @@ package controller;
 import chatbotserver.ChatBotServer;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -27,8 +34,19 @@ public class ChatBotServerController implements Initializable {
     
     @FXML
     public TextField txConexoes;
+
+    @FXML
+    public Button btIniciar;
+    
+    @FXML
+    public Button btParar;
+    
+    @FXML
+    public ListView clientes;
     
     private Worker<String> worker;
+    
+    public BooleanProperty isServerRunning = new SimpleBooleanProperty(false);
 
     /**
      * Initializes the controller class.
@@ -57,14 +75,26 @@ public class ChatBotServerController implements Initializable {
              * Função chamada ao usuário cancelar a Task.
              */
             protected void cancelled() {
+            	Platform.runLater(() -> {
+                	isServerRunning.set(false);
+                });
                 ChatBotServer.aplicacao.fecharConexao();
+                
                 System.out.println("cancelou");
             }
 
             
             
         };
-        
+     
+        // realiza os binds
+        btIniciar.disableProperty().bind(isServerRunning);
+        btParar.disableProperty().bind(Bindings.createBooleanBinding(() -> {
+        	if(isServerRunning.get()){
+        		return false;
+        	}
+        	return true;
+        }, isServerRunning));
     }
 
     @FXML
@@ -72,6 +102,9 @@ public class ChatBotServerController implements Initializable {
         
         // Inicializa a execução da Thread.
         ((Service) worker).restart();
+        Platform.runLater(() -> {
+        	isServerRunning.set(true);
+        });
         
     }
 
@@ -80,6 +113,9 @@ public class ChatBotServerController implements Initializable {
 
         // Cancela a execução da Thread.
         worker.cancel();
+//        Platform.runLater(() -> {
+//        	isServerRunning.set(false);
+//        });
         
     }
 }
