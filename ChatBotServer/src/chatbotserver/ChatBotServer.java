@@ -7,6 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -77,7 +79,14 @@ public class ChatBotServer extends Application {
 					Thread t = new Thread(c);
 					t.start();
 
-				} catch (EOFException eOFException) {
+				} catch (SocketException socketException) {
+					exibirMensagem("\nServidor parado");
+					contador = 1;
+					fecharConexao();
+					Platform.runLater(() -> {
+						controller.isServerRunning.set(false);
+					});
+				}catch (EOFException eOFException) {
 					exibirMensagem("\nServidor encerrou a conexão.");
 				} finally {
 					contador++;
@@ -123,7 +132,7 @@ public class ChatBotServer extends Application {
 //					output.close();
 //					input.close();
 //					conexao.close();
-				if(!server.isClosed()){
+				if(server != null || !server.isClosed()){
 					server.close();}
 
 //				}
