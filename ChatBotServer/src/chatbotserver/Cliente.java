@@ -121,7 +121,8 @@ public class Cliente implements Runnable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(conexao.getInetAddress().getHostName() + " ");
-		sb.append("(" + conexao.getInetAddress().getHostAddress() + ")");
+		sb.append("(" + conexao.getInetAddress().getHostAddress() );
+		sb.append(":"+conexao.getPort()+")");
 		return sb.toString();
 	}
 
