@@ -74,7 +74,7 @@ public class ChatBotServer extends Application {
 
 				try {
 					clientSocket = aguardaConexao(); // espera uma conexão.
-					
+
 					Cliente c = new Cliente(clientSocket, controller);
 					Thread t = new Thread(c);
 					t.start();
@@ -86,7 +86,7 @@ public class ChatBotServer extends Application {
 					Platform.runLater(() -> {
 						controller.isServerRunning.set(false);
 					});
-				}catch (EOFException eOFException) {
+				} catch (EOFException eOFException) {
 					exibirMensagem("\nServidor encerrou a conexão.");
 				} finally {
 					contador++;
@@ -116,33 +116,34 @@ public class ChatBotServer extends Application {
 	public void fecharConexao() {
 		exibirMensagem("\nFechando conexão");
 		System.out.println("Fechando conexão");
-//		if (!clientes.isEmpty()) {
+		if (!clientes.isEmpty()) {
 			try {
-//				for (Cliente cliente : clientes) {
-//
-//					ObjectOutputStream output = cliente.getOutput();
-//					ObjectInputStream input = cliente.getInput();
-//					Socket conexao = cliente.getConexao();
-//					try {
-//						cliente.finalize();
-//
-//					} catch (Throwable e) {
-//						e.printStackTrace();
-//					}
-//					output.close();
-//					input.close();
-//					conexao.close();
-				if(server != null || !server.isClosed()){
-					server.close();}
+				for (Cliente cliente : clientes) {
 
-//				}
-//				Platform.runLater(() -> {
-//					clientes.clear();
-//				});
+					ObjectOutputStream output = cliente.getOutput();
+					ObjectInputStream input = cliente.getInput();
+					Socket conexao = cliente.getConexao();
+					try {
+						cliente.finalize();
+
+					} catch (Throwable e) {
+						e.printStackTrace();
+					}
+					output.close();
+					input.close();
+					conexao.close();
+					if (server != null && !server.isClosed()) {
+						server.close();
+					}
+
+				}
+				Platform.runLater(() -> {
+					clientes.clear();
+				});
 			} catch (IOException iOException) {
 				iOException.printStackTrace();
 			}
-//		}
+		}
 	}
 
 	private void exibirMensagem(String msg) {

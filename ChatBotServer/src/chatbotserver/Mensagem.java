@@ -44,9 +44,9 @@ public class Mensagem {
 
 			return "Top 10 trends mundiais:\n" + new Twitter().getTrends() + "\n";
 
-		} else if (comando.matches("\\\\pergunta")) {
+		} else if (comando.contains("\\pergunta")) {
 
-			return "ainda não desenvolvido2";
+			return "Perguntas relacionadas: \n" + new StackOverflow(comando).getAnswer() + "\n";
 
 		} else {
 
