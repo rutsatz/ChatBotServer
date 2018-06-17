@@ -43,11 +43,6 @@ public class Cliente implements Runnable {
 		enviarDados(
 				"Conexão estabelecida com sucesso" + "\nDigite \"\\help\" para ver a lista de comandos disponíveis");
 
-		// Atualiza a lista de clientes conectados.
-		Platform.runLater(() -> {
-			ChatBotServer.clientes.add(this);
-
-		});
 
 		try {
 			// Loop que fica recebendo as mensagens desse cliente.
