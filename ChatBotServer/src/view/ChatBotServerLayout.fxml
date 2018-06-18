@@ -36,21 +36,24 @@
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="94.0" minWidth="10.0" prefWidth="84.0" />
               </columnConstraints>
               <rowConstraints>
+                  <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Porta" />
-                  <TextField fx:id="txPorta" text="12345" GridPane.columnIndex="1" />
-                  <ButtonBar GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                  <Label text="Porta" GridPane.rowIndex="1" />
+                  <TextField fx:id="txPorta" text="12345" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <ButtonBar GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                     <buttons>
                         <Button fx:id="btIniciar" alignment="CENTER" mnemonicParsing="false" onAction="#iniciarServidor" text="Iniciar" />
                         <Button fx:id="btParar" alignment="CENTER" mnemonicParsing="false" onAction="#pararServidor" text="Parar" />
                     </buttons>
                   </ButtonBar>
-                  <Label text="Limite de Conexões" GridPane.rowIndex="1" />
-                  <TextField fx:id="txConexoes" text="100" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="Limite de Conexões" GridPane.rowIndex="2" />
+                  <TextField fx:id="txConexoes" text="100" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label text="Status" />
+                  <Label fx:id="lblStatus" text="Label" GridPane.columnIndex="1" />
                </children>
                <BorderPane.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -92,17 +95,20 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Porta" />
-                  <TextField fx:id="txPorta1" text="7000" GridPane.columnIndex="1" />
-                  <Label text="Limite de Conexões" GridPane.rowIndex="1" />
-                  <TextField fx:id="txConexoes1" text="100" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Button fx:id="btIniciar1" alignment="CENTER" mnemonicParsing="false" onAction="#iniciarServidor1" text="Iniciar" GridPane.rowIndex="2" />
-                  <Button fx:id="btParar1" alignment="CENTER" mnemonicParsing="false" onAction="#pararServidor1" text="Parar" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label text="Porta" GridPane.rowIndex="1" />
+                  <TextField fx:id="txPorta1" text="7000" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="Limite de Conexões" GridPane.rowIndex="2" />
+                  <TextField fx:id="txConexoes1" text="100" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Button fx:id="btIniciar1" alignment="CENTER" mnemonicParsing="false" onAction="#iniciarServidor1" text="Iniciar" GridPane.rowIndex="3" />
+                  <Button fx:id="btParar1" alignment="CENTER" mnemonicParsing="false" onAction="#pararServidor1" text="Parar" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Label text="Status" />
+                  <Label fx:id="lblStatus1" text="Label" GridPane.columnIndex="1" />
                </children>
             </GridPane>
          </left>

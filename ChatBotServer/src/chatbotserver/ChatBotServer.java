@@ -31,12 +31,14 @@ public class ChatBotServer extends Application {
 
 	private ServerSocket server; // Socket do servidor.
 	private ServerSocket server1; // Socket do servidor.
-	private int contador = 1; // Contador do número de conexões.
+	private int contador = 1; // Contador do nï¿½mero de conexï¿½es.
 
 	public static ObservableList<Cliente> clientes;
 	public static ObservableList<Cliente> clientes1;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javafx.application.Application#start(javafx.stage.Stage)
 	 */
 	@Override
@@ -58,15 +60,18 @@ public class ChatBotServer extends Application {
 
 		stage.setHeight(500);
 		stage.setWidth(700);
-		
-		
+
 		stage.setTitle("Servidor Chat Bot");
 		stage.setScene(scene);
 		stage.show();
 
 		stage.setOnCloseRequest((WindowEvent e) -> {
-			fecharConexao();
-			fecharConexao1();
+			if (controller.sbp.get()) {
+				fecharConexao();
+			}
+			if (controller.sbp1.get()) {
+				fecharConexao1();
+			}
 		});
 
 	}
@@ -80,61 +85,63 @@ public class ChatBotServer extends Application {
 			// cria o ServerSocket
 			server = new ServerSocket(porta, limiteClientes);
 
-			while (controller.isServerRunning.get()) {
+			while (controller.sbp.get()) {
 
 				Socket clientSocket = null;
 
 				try {
-					clientSocket = aguardaConexao(); // espera uma conexão.
+					clientSocket = aguardaConexao(); // espera uma conexï¿½o.
 
 					Cliente c = new Cliente(clientSocket, controller);
-					
+
 					// Atualiza a lista de clientes conectados.
 					Platform.runLater(() -> {
 						ChatBotServer.clientes.add(c);
 
 					});
-					
+
 					Thread t = new Thread(c);
 					t.start();
 
 				} catch (SocketException socketException) {
 					exibirMensagem("\nServidor parado");
 					contador = 1;
-					fecharConexao();
-					Platform.runLater(() -> {
-						controller.isServerRunning.set(false);
-					});
+					if (controller.sbp.get()) {
+						fecharConexao();
+					}
+					// Platform.runLater(() -> {
+					// controller.isServerRunning.set(false);
+					// });
 				} catch (EOFException eOFException) {
-					exibirMensagem("\nServidor encerrou a conexão.");
+					exibirMensagem("\nServidor encerrou a conexï¿½o.");
 				} finally {
 					contador++;
 				}
 			}
 
 		} catch (IOException iOException) {
-			exibirMensagem("\nNão foi possível iniciar o servidor!");
+			exibirMensagem("\nNï¿½o foi possï¿½vel iniciar o servidor!");
 			iOException.printStackTrace();
 		} finally {
-			if (!controller.isServerRunning.get())
-				fecharConexao(); // fecha a conexão.
+			if (!controller.sbp.get())
+				fecharConexao(); // fecha a conexï¿½o.
 		}
 
 	}
 
 	private Socket aguardaConexao() throws IOException {
 
-		exibirMensagem("\nAguardando conexão");
+		exibirMensagem("\nAguardando conexï¿½o");
 
 		Socket conexao = server.accept(); // permite que o servidor aceite a
-											// conexão.
-		exibirMensagem("\nConexão " + contador + " recebida de: " + conexao.getInetAddress().getHostName());
+											// conexï¿½o.
+		exibirMensagem("\nConexï¿½o " + contador + " recebida de: " + conexao.getInetAddress().getHostName());
 		return conexao;
 	}
 
 	public void fecharConexao() {
-		exibirMensagem("\nFechando conexão");
-		System.out.println("Fechando conexão");
+		exibirMensagem("\nFechando conexï¿½o");
+		System.out.println("Fechando conexï¿½o");
 		if (server != null && !server.isClosed()) {
 			try {
 				server.close();
@@ -177,10 +184,6 @@ public class ChatBotServer extends Application {
 		});
 	}
 
-	
-	
-	
-	
 	public void rodarServidor1() {
 
 		try {
@@ -190,64 +193,63 @@ public class ChatBotServer extends Application {
 			// cria o ServerSocket
 			server1 = new ServerSocket(porta, limiteClientes);
 
-			while (controller.isServerRunning1.get()) {
+			while (controller.sbp1.get()) {
 
 				Socket clientSocket = null;
 
 				try {
-					clientSocket = aguardaConexao1(); // espera uma conexão.
+					clientSocket = aguardaConexao1(); // espera uma conexï¿½o.
 
-					
-					
 					Cliente c = new Cliente(clientSocket, controller);
-					
+
 					// Atualiza a lista de clientes conectados.
 					Platform.runLater(() -> {
 						ChatBotServer.clientes1.add(c);
 
 					});
 
-					
 					Thread t = new Thread(c);
 					t.start();
 
 				} catch (SocketException socketException) {
 					exibirMensagem("\nServidor parado 1");
-//					contador = 1;
-					fecharConexao1();
-					Platform.runLater(() -> {
-						controller.isServerRunning1.set(false);
-					});
+					// contador = 1;
+					if (controller.sbp1.get()) {
+						fecharConexao1();
+					}
+					// Platform.runLater(() -> {
+					// controller.isServerRunning1.set(false);
+					// });
 				} catch (EOFException eOFException) {
-					exibirMensagem("\nServidor encerrou a conexão 1.");
+					exibirMensagem("\nServidor encerrou a conexï¿½o 1.");
 				} finally {
-//					contador++;
+					// contador++;
 				}
 			}
 
 		} catch (IOException iOException) {
-			exibirMensagem1("\nNão foi possível iniciar o servidor! 1");
+			exibirMensagem1("\nNï¿½o foi possï¿½vel iniciar o servidor! 1");
 			iOException.printStackTrace();
 		} finally {
-			if (!controller.isServerRunning1.get())
-				fecharConexao1(); // fecha a conexão.
+			if (controller.sbp1.get())
+				fecharConexao1(); // fecha a conexï¿½o.
 		}
 
 	}
 
 	private Socket aguardaConexao1() throws IOException {
 
-		exibirMensagem1("\nAguardando conexão 1");
+		exibirMensagem1("\nAguardando conexï¿½o 1");
 
 		Socket conexao = server1.accept(); // permite que o servidor aceite a
-											// conexão.
-		exibirMensagem1("\nConexão " + contador + " recebida de: " + conexao.getInetAddress().getHostName());
+											// conexï¿½o.
+		exibirMensagem1("\nConexï¿½o " + contador + " recebida de: " + conexao.getInetAddress().getHostName());
 		return conexao;
 	}
 
 	public void fecharConexao1() {
-		exibirMensagem1("\nFechando conexão");
-		System.out.println("Fechando conexão 1");
+		exibirMensagem1("\nFechando conexï¿½o");
+		System.out.println("Fechando conexï¿½o 1");
 		if (server1 != null && !server1.isClosed()) {
 			try {
 				server1.close();
@@ -289,10 +291,7 @@ public class ChatBotServer extends Application {
 			controller.taMensagens1.appendText(msg);
 		});
 	}
-	
-	
-	
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}

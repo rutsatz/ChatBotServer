@@ -9,6 +9,6 @@
 	<classpathentry kind="lib" path="lib/twitter4j-media-support-4.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/twitter4j-stream-4.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/jsonp.jar"/>
-	<classpathentry kind="lib" path="C:/Users/rutsa/git/ChatBotServer/ChatBotServer/lib/jsonpimpl.jar"/>
+	<classpathentry kind="lib" path="/home/raffa/git/ChatBotServer/ChatBotServer/lib/jsonpimpl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
