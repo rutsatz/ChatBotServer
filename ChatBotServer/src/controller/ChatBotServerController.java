@@ -14,11 +14,14 @@ import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 /**
  * FXML Controller class
@@ -45,7 +48,7 @@ public class ChatBotServerController implements Initializable {
 	@FXML
 	public ListView clientes;
 
-	private Worker<String> worker;
+	public Worker<String> worker;
 
 	public BooleanProperty isServerRunning = new SimpleBooleanProperty(false);
 
@@ -73,7 +76,10 @@ public class ChatBotServerController implements Initializable {
 	@FXML
 	public Label lblStatus1;
 
-	private Worker<String> worker1;
+	@FXML
+	public Group group;
+	
+	public Worker<String> worker1;
 
 	public BooleanProperty isServerRunning1 = new SimpleBooleanProperty(false);
 
@@ -199,6 +205,16 @@ public class ChatBotServerController implements Initializable {
 		lblStatus1.textProperty().bind(Bindings.format("%s", worker1.runningProperty()));
 		sbp1.bind(worker1.runningProperty());
 
+		
+		
+		Circle circle1 = (Circle) group.lookup("#circle1");
+		Circle circle2 = (Circle) group.lookup("#circle2");
+		System.out.println("circle1 "+circle1);
+//		Platform.runLater(() -> {
+		circle1.setFill(Color.DARKSLATEGRAY);
+		circle2.setFill(Color.BLACK);
+//		});
+		
 	}
 
 	@FXML
@@ -209,7 +225,6 @@ public class ChatBotServerController implements Initializable {
 		// Platform.runLater(() -> {
 		// isServerRunning.set(true);
 		// });
-
 	}
 
 	@FXML

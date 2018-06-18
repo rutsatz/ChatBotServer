@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Map;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -53,11 +54,15 @@ public class ChatBotServer extends Application {
 		Parent root = loader.load();
 		controller = loader.getController();
 
+		
+		
 		controller.clientes.setItems(clientes);
 		controller.clientes1.setItems(clientes1);
 
 		Scene scene = new Scene(root);
 
+		Map<String, Object> namespace = loader.getNamespace();
+		
 		stage.setHeight(500);
 		stage.setWidth(700);
 
@@ -65,7 +70,19 @@ public class ChatBotServer extends Application {
 		stage.setScene(scene);
 		stage.show();
 
+//		System.out.println("root.lookup(\"circle1\")" + root.lookup("#circle1"));
+		
 		stage.setOnCloseRequest((WindowEvent e) -> {
+
+			System.out.println("controller.sbp.get() " + controller.sbp.get());
+			System.out.println("controller.sbp1.get() " + controller.sbp1.get());
+			
+			controller.worker.cancel();
+			controller.worker1.cancel();
+			
+			System.out.println("controller.sbp.get() " + controller.sbp.get());
+			System.out.println("controller.sbp1.get() " + controller.sbp1.get());
+			
 			if (controller.sbp.get()) {
 				fecharConexao();
 			}
@@ -140,8 +157,8 @@ public class ChatBotServer extends Application {
 	}
 
 	public void fecharConexao() {
-		exibirMensagem("\nFechando conex�o");
-		System.out.println("Fechando conex�o");
+//		exibirMensagem("\nFechando conex�o");
+//		System.out.println("Fechando conex�o");
 		if (server != null && !server.isClosed()) {
 			try {
 				server.close();
